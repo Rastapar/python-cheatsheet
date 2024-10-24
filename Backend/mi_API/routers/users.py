@@ -1,7 +1,7 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, APIRouter
 from pydantic import BaseModel
 
-my_app = FastAPI()
+router = APIRouter()
 
 # BaseModel ayuda a crear una estructura de forma mas sencilla
 class User(BaseModel):
@@ -17,7 +17,8 @@ users = [
         User(id = 3, name = "Fanta", surname = "Naranja", web = "www.amazon.es", age = 40),
     ]
 
-@my_app.delete("/user/{id}")
+
+@router.delete("/user/{id}")
 async def _(id: int):
     found : bool = False
     for index, user in enumerate(users):
@@ -30,9 +31,10 @@ async def _(id: int):
     
     return {"message": "User deleted"}
 
+
 # "put" para actualizar usuarios enteros
 # "patch" para actualizar usuarios parcialmente
-@my_app.put("/user/")
+@router.put("/user/")
 async def _(user: User):
     found : bool = False
     for index, saved_user in enumerate(users):
@@ -45,31 +47,38 @@ async def _(user: User):
     
     return {"message": "User updated"}
 
+
 # "post" para crear un usuario
-@my_app.post("/user/")
+@router.post("/user/", response_model=User, status_code=201) # status_code=201 para indicar que se ha creado un recurso
 async def _(user: User):
     if type(search_user(user.id)) == User:
-        return {"error": "User already exists"}
+        raise HTTPException(status_code=404, detail="User already exists")    # send custom status code        
+    
     users.append(user)
-    return {"message": "User created"}
+    return user # defined the typo in response_model
+
 
 # query para los parametros opcionales
-@my_app.get("/user-query/")  # the same as "/user-query/{id}" but with query parameters
+@router.get("/user-query/")  # the same as "/user-query/{id}" but with query parameters
 async def _(id: int):
     return search_user(id)
+
 
 # path para los parametros obligatorios
-@my_app.get("/user/{id}")
+@router.get("/user/{id}")
 async def _(id: int):
     return search_user(id)
 
-@my_app.get("/users")
+
+@router.get("/users")
 async def _():
     return users
 
-@my_app.get("/base-user")
+
+@router.get("/base-user")
 async def _():
     return User(name = "Tato", surname = "Piña", web = "www.github.com", age = 50)
+
 
 def search_user(id: int):
     users_byid = list( filter(lambda user: user.id == id, users) )
