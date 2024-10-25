@@ -1,0 +1,5 @@
+username: ricogordo
+pass: o11mqt6zzxuOOiOA
+uri: mongodb+srv://ricogordog:Ew0aUDGz6iKgYo54@cluster0.6q1uo.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+uri_vs_mongodb_extension: mongodb+srv://ricogordog:Ew0aUDGz6iKgYo54@cluster0.6q1uo.mongodb.net/
+
